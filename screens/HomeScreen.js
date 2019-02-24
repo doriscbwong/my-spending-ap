@@ -4,7 +4,8 @@ import {
   StyleSheet,
   ScrollView,
   Text,
-  Platform
+  Platform,
+  FlatList
 } from 'react-native';
 
 export default class HomeScreen extends React.Component {
@@ -14,7 +15,33 @@ export default class HomeScreen extends React.Component {
   
   render() {
 
-    const date = new Date();
+    const date = new Date()
+
+    const testData = [
+      {
+        key: "0",
+        amount: 9.8,
+        desc: 'Food',
+        date: new Date()
+      },
+
+      {
+        key: "1",
+        amount: 15.5,
+        desc: 'Movie',
+        date: new Date()
+      },
+
+      {
+        key: "2",
+        amount: 33.1,
+        desc: 'Book',
+        date: new Date()
+      }      
+    ]
+
+    const total = testData.map(item => item.amount)
+    const totalAmount = total.reduce((accumulator, currentValue) => accumulator + currentValue)
 
     const Card = ({amount = 0, item = "no-name"}) => (
         <View style={{
@@ -40,15 +67,21 @@ export default class HomeScreen extends React.Component {
                 backgroundColor:"LightGray",}}>
               <Text>{date.toLocaleDateString()}</Text>
             </View>
-            <Card amount={8} item={"Food"} />
-            <Card />
+            {/* <Card amount={8} item={"Food"} /> */}
+            {/* <Card /> */}
+            <FlatList
+              data={testData}
+              renderItem={({item}) => (
+                <Card amount={item.amount.toFixed(2)} item = {item.desc} />
+              )}
+            />           
           </View>
         </ScrollView>
 
         {/* <View style={styles.tabBarInfoContainer}> */}
         <View style={styles.staticBottomBar}>
           <Text style={{fontWeight: 'bold'}}>Total</Text>
-          <Text style={{fontWeight: 'bold'}}>RM 10</Text>
+          <Text style={{fontWeight: 'bold'}}>RM {totalAmount.toFixed(2)}</Text>
         </View>
       </View>
     );
