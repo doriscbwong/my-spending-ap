@@ -8,40 +8,48 @@ import {
   FlatList
 } from 'react-native';
 
+import Firebase from '../api/config'
+
 export default class HomeScreen extends React.Component {
   static navigationOptions = {
     title: 'Spending',
   };
-  
+
+  constructor(props) {
+    super(props)
+    this.state = {items: null };
+    const items = Firebase.database().ref('users/doris')
+    items.on('value', (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        //Convert firebase objects into an array
+        const convertedItems = Object.values(data);
+        this.setState({items:convertedItems})
+      }
+      
+    })
+  }
+
+  shouldComponentUpdate(newProps, newState) {
+    const valueFromOtherScreen = newProps.navigation.getParam("passedData", false);
+
+    if (valueFromOtherScreen) {
+      alert(valueFromOtherScreen);
+    }
+
+    return true;
+  }
+
+
   render() {
 
     const date = new Date()
 
-    const testData = [
-      {
-        key: "0",
-        amount: 9.8,
-        desc: 'Food',
-        date: new Date()
-      },
-
-      {
-        key: "1",
-        amount: 15.5,
-        desc: 'Movie',
-        date: new Date()
-      },
-
-      {
-        key: "2",
-        amount: 33.1,
-        desc: 'Book',
-        date: new Date()
-      }      
-    ]
-
-    const total = testData.map(item => item.amount)
-    const totalAmount = total.reduce((accumulator, currentValue) => accumulator + currentValue)
+    const testData = this.state.items || [];
+    
+    const totalAmount = testData
+      .map(item => Number(item.price))
+      .reduce((acc,value) => acc + value, 0);
 
     const Card = ({amount = 0, item = "no-name"}) => (
         <View style={{
@@ -72,7 +80,7 @@ export default class HomeScreen extends React.Component {
             <FlatList
               data={testData}
               renderItem={({item}) => (
-                <Card amount={item.amount.toFixed(2)} item = {item.desc} />
+                <Card amount={Number(item.price).toFixed(2)} item = {item.desc} />
               )}
             />           
           </View>

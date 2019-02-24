@@ -1,5 +1,14 @@
 import React from 'react';
-import {Platform, StyleSheet, View, Text, TextInput, TouchableOpacity, DatePickerIOS, DatePickerAndroid } from 'react-native';
+import {Platform,
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  DatePickerIOS,
+  DatePickerAndroid } from 'react-native';
+
+import Firebase from '../api/config'
 
 export default class LinksScreen extends React.Component {
   static navigationOptions = {
@@ -27,6 +36,32 @@ export default class LinksScreen extends React.Component {
     }
   }
 
+/*
+  handleAddItem = () => {
+    Firebase.database().ref('users/' + 'doris').push({
+      items : [
+        {
+          amount:this.state.price,
+          desc:this.state.desc,
+          date: this.state.date.toLocaleDateString(),
+        }
+      ]
+    })
+  }
+*/
+
+handleAddItem = (data) => {
+  if (data.desc !== '' && data.amount !== 0 && data.date !== null) {
+    data.date = data.date.toLocaleDateString()
+    Firebase.database()
+    .ref("users/"+'doris')
+    .push(data) 
+
+    this.props.navigation.navigate("Home", {passedData:"some data passed from link screen"})
+  } else {
+    alert("Empty value")
+  }
+}
 
   render() {
     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
@@ -79,8 +114,9 @@ export default class LinksScreen extends React.Component {
               </View>
             </View>
             <TouchableOpacity
+              onPress={() => this.handleAddItem(this.state)}
               style={styles.button}
-              onPress={() => alert(JSON.stringify(this.state))}
+              
             >
               <Text>ADD</Text>
             </TouchableOpacity>
